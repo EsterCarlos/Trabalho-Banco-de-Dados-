@@ -1,0 +1,99 @@
+O Banco de dados de uma determinada empresa , no qual contém os seguintes dados ; funcionarios , tipos de funcionarios , função , equipes , localidade da empresa , setor que o funcionario trabalha.
+
+
+
+
+Create database empresa
+
+use empresa
+
+CREATE TABLE funcionarios (
+	id_funcionario int NOT NULL identity(0,1),
+	nome varchar(255),
+	salario float,
+	função varchar(255),
+	dataNascimento date,
+	id_localidade int,
+	descricao varchar(255),
+	PRIMARY KEY (id_funcionario)
+);
+
+CREATE TABLE equipes(
+	id_equipe int NOT NULL identity(0,1),
+	id_funcionario int,
+	id_líder int,
+	id_setor int,
+	nome varchar(255),
+	id_nacionalidade int,
+	metas int,
+	PRIMARY KEY (id_equipe)
+);
+
+CREATE TABLE localidade(
+	id_localidade int NOT NULL identity(0,1),
+	nome varchar(255),
+	ramo varchar(255),
+	PRIMARY KEY(id_localidade),
+);
+
+CREATE TABLE função(
+	id_setor int NOT NULL identity(0, 1),
+	nome varchar (255),
+	id_localidade int,
+	PRIMARY KEY(id_setor)
+);
+
+CREATE TABLE lideres (
+	id_líder int NOT NULL identity(0, 1),
+	nome varchar (255),
+	idade int,
+	planta  varchar (255),
+	salario float,
+	PRIMARY KEY(id_líder)
+);
+
+
+
+ALTER TABLE funcionarios ADD CONSTRAINT funcionarios_fk0 FOREIGN KEY(id_localidade) REFERENCES nacionalidades(id_localidade);
+
+ALTER TABLE equipes ADD CONSTRAINT equipes_fk1 FOREIGN KEY(id_equipe) REFERENCES funcionarios(id_funcionario);
+
+ALTER TABLE equipes ADD CONSTRAINT equipes_fk2 FOREIGN KEY(id_lideres) REFERENCES tecnicos(id_lider);
+
+ALTER TABLE equipes ADD CONSTRAINT equipes_fk3 FOREIGN KEY(id_setor) REFERENCES função(id_setor);
+
+ALTER TABLE times ADD CONSTRAINT equipes_fk4 FOREIGN KEY(id_localidades) REFERENCES localidades (id_localidade);
+
+ALTER TABLE função ADD CONSTRAINT função_fk0 FOREIGN KEY(id_localidade) REFERENCES nacionalidades(id_localidade);
+
+select sum(id_funcionario) as "Total de funcionarios" from funcionarios
+
+select AVG(f.salario) as "Media salarial de funcionarios", AVG(tc.salario) as "Media salarial de lideres"  from equipes e inner join funcionarios f on e.id_funcionario = f.id_funcionario inner join lideres ld on l.id_lider = ld.id_lider
+
+select count(id_localidade) as "contador", nome as "Nome Planta" from localidade GROUP BY nome
+
+select t.nome as "nome da equipe", f.nome as "nome do funcionario", f.função as "função funcionario" from equipes e left join funcionarios f on e.id_funcionario = f.id_funcionario
+
+select t.nome as "Nome da equipe", e.nome as "nome do setor", n.nome as "nome da localidade" from função e inner join equipes e on e.id_setor = e.id_setor inner join localidade l on l.id_localidade = e.id_localidade ORDER BY e.nome, e.nome,l.nome ASC
+
+select	max(salario) as "Salario maximo dos funcionarios", min(salario) as "Salario minimo dos funcionarios" from funcionarios
+
+select nome as "nome da equipe", (select sum(salario) from funcionario f inner join equipes e on f.id_funcionario = e.id_funcionario) as "custos" from equipes group by nome
+
+SELECT nome,FORMAT (dataNascimento, 'dd-MM-yy') as date from funcionarios
+
+SELECT nome from lideres where salario in(select max(salario) from lideres)
+
+SELECT nome, id_localidade FROM localidade WHERE id_localidade NOT IN (1,2,3);
+
+CREATE VIEW vwFuncionarios
+as
+	select nome,função,setor,dataNascimento from funcionarios
+
+CREATE VIEW vwEquipes
+as
+	select t.nome as "equipe",e.nome as "setor",l.nome as"localidade",metas,l.nome as"lideres" from equipes t inner join função e on e.id_setor = e.id_setor inner join localidade l on e.id_setor = l.id_localidade inner join lideres ld on ld.id_lider = l.id_lider
+
+CREATE VIEW vwFunção
+as
+	select e.nome, n.nome as "Setor" from função e inner join localidade l on e.id_localidade = l.id_localidaden 
